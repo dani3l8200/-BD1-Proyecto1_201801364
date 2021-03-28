@@ -1,0 +1,67 @@
+
+SQL*Loader: Release 18.0.0.0.0 - Production on Sat Mar 27 19:16:09 2021
+Version 18.4.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+Control File:   C:\BD1\proyecto1\load_data\carga.ctl
+Character Set UTF8 specified for all input.
+
+Data File:      ICE-Fuente.csv
+  Bad File:     C:\BD1\proyecto1\load_data\ICE-Fuente.bad
+  Discard File:  none specified
+ 
+ (Allow all discards)
+
+Number to load: ALL
+Number to skip: 1
+Errors allowed: 50
+Bind array:     250 rows, maximum of 1048576 bytes
+Continuation:    none specified
+Path used:      Conventional
+
+Table TEMPORAL, loaded from every logical record.
+Insert option in effect for this table: INSERT
+
+   Column Name                  Position   Len  Term Encl Datatype
+------------------------------ ---------- ----- ---- ---- ---------------------
+NOMBRE_ELECCION                     FIRST     *   ,       CHARACTER            
+YEAR_ELECCION                        NEXT     *   ,       CHARACTER            
+PAIS                                 NEXT     *   ,       CHARACTER            
+REGION                               NEXT     *   ,       CHARACTER            
+DEPTO                                NEXT     *   ,       CHARACTER            
+MUNICIPIO                            NEXT     *   ,       CHARACTER            
+PARTIDO                              NEXT     *   ,       CHARACTER            
+NOMBRE_PARTIDO                       NEXT     *   ,       CHARACTER            
+SEXO                                 NEXT     *   ,       CHARACTER            
+RAZA                                 NEXT     *   ,       CHARACTER            
+ANALFABETOS                          NEXT     *   ,       CHARACTER            
+ALFABETOS                            NEXT     *   ,       CHARACTER            
+SEXO2                                NEXT     *   ,       CHARACTER            
+RAZA2                                NEXT     *   ,       CHARACTER            
+PRIMARIA                             NEXT     *   ,       CHARACTER            
+NIVEL_MEDIO                          NEXT     *   ,       CHARACTER            
+UNIVERSITARIOS                       NEXT     *   ,       CHARACTER            
+
+value used for ROWS parameter changed from 250 to 239
+
+Table TEMPORAL:
+  20970 Rows successfully loaded.
+  0 Rows not loaded due to data errors.
+  0 Rows not loaded because all WHEN clauses were failed.
+  0 Rows not loaded because all fields were null.
+
+
+Space allocated for bind array:                1048254 bytes(239 rows)
+Read   buffer bytes: 1048576
+
+Total logical records skipped:          1
+Total logical records read:         20970
+Total logical records rejected:         0
+Total logical records discarded:        0
+
+Run began on Sat Mar 27 19:16:09 2021
+Run ended on Sat Mar 27 19:16:13 2021
+
+Elapsed time was:     00:00:03.25
+CPU time was:         00:00:00.12
