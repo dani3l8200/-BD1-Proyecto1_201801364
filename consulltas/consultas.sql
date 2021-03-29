@@ -108,4 +108,62 @@ INNER JOIN (SELECT p.nombre as pais, d.nombre as departamento,
 where x.universitarios > h.universitarios;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 6 **************************************************************************************/
-
+SELECT x.pais, x.region, ROUND(sum(x.total)/(SELECT count(*) 
+from (SELECT p.nombre as pais, d.nombre as departamento, r.nombre as region, sum(cv.analfabetos+cv.alfabetos) as total
+                from conteovotos  cv
+                INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+                INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+                INNER JOIN region r ON d.id_region = r.id_region
+                INNER JOIN pais p ON r.id_pais = p.id_pais
+                group by p.nombre, d.nombre, r.nombre) y 
+where x.pais = y.pais and x.region = y.region),2) as promedio
+from (SELECT p.nombre as pais, d.nombre as departamento, r.nombre as region, sum(cv.analfabetos+cv.alfabetos) as total
+                from conteovotos  cv
+                INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+                INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+                INNER JOIN region r ON d.id_region = r.id_region
+                INNER JOIN pais p ON r.id_pais = p.id_pais
+                group by p.nombre, d.nombre, r.nombre) x
+group by x.pais, x.region
+order by promedio desc;
+/****************************************************************************************************************************************************************/
+/************************************************************** Consulta 7 **************************************************************************************/
+SELECT DISTINCT x.pais, x.muni, (select h.partido from (SELECT p.nombre as pais, d.nombre as departamento, 
+m.nombre  muni, par.nombre as partido, sum(cv.alfabetos+cv.analfabetos) as total 
+from conteovotos cv
+INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+INNER JOIN region r ON d.id_region = r.id_region
+INNER JOIN pais p ON r.id_pais = p.id_pais
+INNER JOIN eleccionpartido elep ON cv.id_eleccion_partido= elep.id_eleccion_partido
+INNER JOIN partido par ON elep.id_partido = par.id_partido
+group by p.nombre, d.nombre, m.nombre, par.nombre) h 
+where h.pais = x.pais and h.muni = x.muni 
+order by h.total desc 
+OFFSET 0 ROWS FETCH NEXT 1 ROWS ONLY) as Partido1,
+(select h.partido from (SELECT p.nombre as pais, d.nombre as departamento, 
+m.nombre  muni, par.nombre as partido, sum(cv.alfabetos+cv.analfabetos) as total 
+from conteovotos cv
+INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+INNER JOIN region r ON d.id_region = r.id_region
+INNER JOIN pais p ON r.id_pais = p.id_pais
+INNER JOIN eleccionpartido elep ON cv.id_eleccion_partido= elep.id_eleccion_partido
+INNER JOIN partido par ON elep.id_partido = par.id_partido
+group by p.nombre, d.nombre, m.nombre, par.nombre) h 
+where h.pais = x.pais and h.muni = x.muni 
+order by h.total desc 
+OFFSET 1 ROWS FETCH NEXT 1 ROWS ONLY) as Partido2
+from (SELECT p.nombre as pais, d.nombre as departamento,
+m.nombre muni, par.nombre as partido, sum(cv.alfabetos+cv.analfabetos) as total 
+from conteovotos cv
+INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+INNER JOIN region r ON d.id_region = r.id_region
+INNER JOIN pais p ON r.id_pais = p.id_pais
+INNER JOIN eleccionpartido elep ON cv.id_eleccion_partido= elep.id_eleccion_partido
+INNER JOIN partido par ON elep.id_partido = par.id_partido
+group by p.nombre, d.nombre, m.nombre, par.nombre) x
+order by pais ;
+/****************************************************************************************************************************************************************/
+/************************************************************** Consulta 8 **************************************************************************************/
