@@ -256,21 +256,37 @@ group by p.nombre, d.nombre, m.nombre, par.nombre) x
 order by pais;
 
 
-SELECT DOS.PAIS, DOS.MUNICIPIO, DOS.PARTIDO FROM(
+SELECT DOS.PAIS, DOS.MUNICIPIO, DOS.PARTIDO, TRES.PARTIDO FROM(
 SELECT UNO.PAIS AS PAIS, UNO.MUNICIPIO AS MUNICIPIO, UNO.PARTIDO AS PARTIDO, ROW_NUMBER() OVER (PARTITION BY UNO.PAIS,UNO.MUNICIPIO ORDER BY UNO.VOTOS desc) AS VOTOS_RANK, UNO.VOTOS
 FROM (
-SELECT PA.NOMBRE_PAIS AS PAIS, MU.NOMBRE_MUNICIPIO AS MUNICIPIO, PAR.NOMBRE_PARTIDO AS PARTIDO, SUM(E.ANALFAVETOS + E.ALFAVETOS) AS VOTOS 
-FROM ELECCION E, MUNICIPIO MU, DEPARTAMENTO DE, REGION RE, PAIS PA, PARTIDO PAR
-WHERE E.MUNICIPIO_ID_MUNICIPIO = MU.ID_MUNICIPIO
-AND MU.DEPARTAMENTO_ID_DEPARTAMENTO = DE.ID_DEPARTAMENTO
-AND DE.REGION_ID_REGION = RE.ID_REGION
-AND RE.PAIS_ID_PAIS = PA.ID_PAIS
-AND E.PARTIDO_ID_PARTIDO = PAR.ID_PARTIDO 
-group by PA.NOMBRE_PAIS, MU.NOMBRE_MUNICIPIO, PAR.NOMBRE_PARTIDO
+SELECT p.nombre AS PAIS, m.nombre AS MUNICIPIO, par.nombre AS PARTIDO, SUM(cv.analfabetos + cv.alfabetos) AS VOTOS 
+FROM conteovotos cv
+INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+INNER JOIN region r ON d.id_region = r.id_region
+INNER JOIN pais p ON r.id_pais = p.id_pais
+INNER JOIN eleccionpartido elep ON cv.id_eleccion_partido= elep.id_eleccion_partido
+INNER JOIN partido par ON elep.id_partido = par.id_partido
+group by p.nombre, m.nombre, par.nombre
 ) UNO
 ORDER BY UNO.PAIS, UNO.MUNICIPIO, VOTOS_RANK
-) DOS
-WHERE DOS.VOTOS_RANK <= 2
+) DOS, (
+SELECT UNO.PAIS AS PAIS, UNO.MUNICIPIO AS MUNICIPIO, UNO.PARTIDO AS PARTIDO, ROW_NUMBER() OVER (PARTITION BY UNO.PAIS,UNO.MUNICIPIO ORDER BY UNO.VOTOS desc) AS VOTOS_RANK, UNO.VOTOS
+FROM (
+SELECT p.nombre AS PAIS, m.nombre AS MUNICIPIO, par.nombre AS PARTIDO, SUM(cv.analfabetos + cv.alfabetos) AS VOTOS 
+FROM conteovotos cv
+INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+INNER JOIN region r ON d.id_region = r.id_xSregion
+INNER JOIN pais p ON r.id_pais = p.id_pais
+INNER JOIN eleccionpartido elep ON cv.id_eleccion_partido= elep.id_eleccion_partido
+INNER JOIN partido par ON elep.id_partido = par.id_partido
+group by p.nombre, m.nombre, par.nombre
+) UNO
+ORDER BY UNO.PAIS, UNO.MUNICIPIO, VOTOS_RANK
+OFFSET 1 ROWS FETCH NEXT 1 ROWS ONLY
+) TRES
+WHERE DOS.VOTOS_RANK <= 1
 ORDER BY DOS.PAIS, DOS.MUNICIPIO, DOS.VOTOS_RANK;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 8 **************************************************************************************/
