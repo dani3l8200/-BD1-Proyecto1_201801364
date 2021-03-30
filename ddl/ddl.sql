@@ -1,14 +1,19 @@
-/******************************************************************************************************/
-TRUNCATE TABLE Pais;
 DROP TABLE Pais cascade constraints;
+DROP TABLE Region cascade constraints;
+DROP TABLE Departamento cascade constraints;
+DROP TABLE Municipio cascade constraints;
+DROP TABLE Eleccion cascade constraints;
+DROP TABLE Partido  cascade constraints;
+DROP TABLE EleccionPartido  cascade constraints;
+DROP TABLE Sexo cascade constraints;
+DROP TABLE Raza  cascade constraints;
+DROP TABLE ConteoVotos cascade constraints;
+/******************************************************************************************************/
 CREATE TABLE Pais(
     id_pais NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL PRIMARY KEY,
     nombre VARCHAR2(100) NOT NULL
 );
-
 /******************************************************************************************************/
-TRUNCATE TABLE Region;
-DROP TABLE Region cascade constraints;
 CREATE TABLE Region(
     id_region NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL PRIMARY KEY,
     nombre VARCHAR2(100) NOT NULL,
@@ -16,8 +21,6 @@ CREATE TABLE Region(
     FOREIGN KEY(id_pais) REFERENCES Pais(id_pais)
 );
 /******************************************************************************************************/
-TRUNCATE TABLE Departamento;
-DROP TABLE Departamento cascade constraints;
 CREATE TABLE Departamento(
     id_departamento NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL PRIMARY KEY,
     nombre VARCHAR2(100) NOT NULL,
@@ -25,8 +28,6 @@ CREATE TABLE Departamento(
     FOREIGN KEY(id_region) REFERENCES Region(id_region)
 );
 /******************************************************************************************************/
-TRUNCATE TABLE Municipio;
-DROP TABLE Municipio cascade constraints;
 CREATE TABLE Municipio(
     id_municipio NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL PRIMARY KEY,
     nombre VARCHAR2(100) NOT NULL,
@@ -34,24 +35,18 @@ CREATE TABLE Municipio(
     FOREIGN KEY(id_departamento) REFERENCES Departamento(id_departamento)
 );
 /******************************************************************************************************/
-TRUNCATE TABLE Eleccion;
-DROP TABLE Eleccion cascade constraints;
 CREATE TABLE Eleccion(
     id_eleccion NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL PRIMARY KEY,
     nombre VARCHAR2(200),
     anio NUMBER
 );
 /******************************************************************************************************/
-TRUNCATE TABLE Partido;
-DROP TABLE Partido  cascade constraints;
 CREATE TABLE Partido(
     id_partido NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL PRIMARY KEY,
     partido VARCHAR2(100),
     nombre VARCHAR2(100)
 );
 /******************************************************************************************************/
-TRUNCATE TABLE EleccionPartido;
-DROP TABLE EleccionPartido  cascade constraints;
 CREATE TABLE EleccionPartido(
     id_eleccion_partido NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL PRIMARY KEY,
     id_eleccion NUMBER NOT NULL,
@@ -60,22 +55,16 @@ CREATE TABLE EleccionPartido(
     FOREIGN KEY(id_partido) REFERENCES Partido(id_partido)
 );
 /******************************************************************************************************/
-TRUNCATE TABLE Sexo;
-DROP TABLE Sexo  cascade constraints;
 CREATE TABLE Sexo(
     id_sexo NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL PRIMARY KEY,
     nombre VARCHAR2(100)
 );
 /******************************************************************************************************/
-TRUNCATE TABLE Raza;
-DROP TABLE Raza  cascade constraints;
 CREATE TABLE Raza(
     id_raza NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL PRIMARY KEY,
     nombre VARCHAR2(100)
 );
 /******************************************************************************************************/
-TRUNCATE TABLE ConteoVotos;
-DROP TABLE ConteoVotos cascade constraints;
 CREATE TABLE ConteoVotos(
     id_conteo_votos NUMBER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL PRIMARY KEY,
     alfabetos NUMBER NOT NULL,
