@@ -368,3 +368,10 @@ group by d.id_departamento, d.nombre) aux
 WHERE result.votos > aux.votos;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 14 ************************************************************************************/
+SELECT UPPER(SUBSTR(m.nombre,1,1)) as INICIAL, SUM(cv.alfabetos+cv.analfabetos) as total FROM conteovotos cv
+INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+INNER JOIN region r ON d.id_region = r.id_region
+INNER JOIN pais p ON r.id_pais = p.id_pais
+group by SUBSTR(m.nombre,1,1)
+order by UPPER(SUBSTR(m.nombre,1,1));
