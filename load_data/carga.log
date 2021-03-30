@@ -1,5 +1,5 @@
 
-SQL*Loader: Release 18.0.0.0.0 - Production on Tue Mar 30 03:53:09 2021
+SQL*Loader: Release 18.0.0.0.0 - Production on Tue Mar 30 07:30:41 2021
 Version 18.4.0.0.0
 
 Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
@@ -22,26 +22,44 @@ Path used:      Conventional
 
 Table TEMPORAL, loaded from every logical record.
 Insert option in effect for this table: INSERT
+TRAILING NULLCOLS option in effect
 
    Column Name                  Position   Len  Term Encl Datatype
 ------------------------------ ---------- ----- ---- ---- ---------------------
 NOMBRE_ELECCION                     FIRST     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:NOMBRE_ELECCION)"
 YEAR_ELECCION                        NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:YEAR_ELECCION)"
 PAIS                                 NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:PAIS)"
 REGION                               NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:REGION)"
 DEPTO                                NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:DEPTO)"
 MUNICIPIO                            NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:MUNICIPIO)"
 PARTIDO                              NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:PARTIDO)"
 NOMBRE_PARTIDO                       NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:NOMBRE_PARTIDO)"
 SEXO                                 NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:SEXO)"
 RAZA                                 NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:RAZA)"
 ANALFABETOS                          NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:ANALFABETOS)"
 ALFABETOS                            NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:ALFABETOS)"
 SEXO2                                NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:SEXO2)"
 RAZA2                                NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:RAZA2)"
 PRIMARIA                             NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:PRIMARIA)"
 NIVEL_MEDIO                          NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:NIVEL_MEDIO)"
 UNIVERSITARIOS                       NEXT     *   ,       CHARACTER            
+    SQL string for column : "TRIM(:UNIVERSITARIOS)"
 
 value used for ROWS parameter changed from 250 to 239
 
@@ -60,8 +78,8 @@ Total logical records read:         20970
 Total logical records rejected:         0
 Total logical records discarded:        0
 
-Run began on Tue Mar 30 03:53:09 2021
-Run ended on Tue Mar 30 03:53:13 2021
+Run began on Tue Mar 30 07:30:41 2021
+Run ended on Tue Mar 30 07:30:44 2021
 
-Elapsed time was:     00:00:04.19
-CPU time was:         00:00:00.14
+Elapsed time was:     00:00:02.98
+CPU time was:         00:00:00.30

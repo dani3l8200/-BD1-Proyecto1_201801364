@@ -254,6 +254,24 @@ INNER JOIN eleccionpartido elep ON cv.id_eleccion_partido= elep.id_eleccion_part
 INNER JOIN partido par ON elep.id_partido = par.id_partido
 group by p.nombre, d.nombre, m.nombre, par.nombre) x
 order by pais;
+
+
+SELECT DOS.PAIS, DOS.MUNICIPIO, DOS.PARTIDO FROM(
+SELECT UNO.PAIS AS PAIS, UNO.MUNICIPIO AS MUNICIPIO, UNO.PARTIDO AS PARTIDO, ROW_NUMBER() OVER (PARTITION BY UNO.PAIS,UNO.MUNICIPIO ORDER BY UNO.VOTOS desc) AS VOTOS_RANK, UNO.VOTOS
+FROM (
+SELECT PA.NOMBRE_PAIS AS PAIS, MU.NOMBRE_MUNICIPIO AS MUNICIPIO, PAR.NOMBRE_PARTIDO AS PARTIDO, SUM(E.ANALFAVETOS + E.ALFAVETOS) AS VOTOS 
+FROM ELECCION E, MUNICIPIO MU, DEPARTAMENTO DE, REGION RE, PAIS PA, PARTIDO PAR
+WHERE E.MUNICIPIO_ID_MUNICIPIO = MU.ID_MUNICIPIO
+AND MU.DEPARTAMENTO_ID_DEPARTAMENTO = DE.ID_DEPARTAMENTO
+AND DE.REGION_ID_REGION = RE.ID_REGION
+AND RE.PAIS_ID_PAIS = PA.ID_PAIS
+AND E.PARTIDO_ID_PARTIDO = PAR.ID_PARTIDO 
+group by PA.NOMBRE_PAIS, MU.NOMBRE_MUNICIPIO, PAR.NOMBRE_PARTIDO
+) UNO
+ORDER BY UNO.PAIS, UNO.MUNICIPIO, VOTOS_RANK
+) DOS
+WHERE DOS.VOTOS_RANK <= 2
+ORDER BY DOS.PAIS, DOS.MUNICIPIO, DOS.VOTOS_RANK;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 8 **************************************************************************************/
 SELECT p.nombre as pais, sum(cv.primaria) as primaria, sum(cv.nivel_medio) as 
@@ -306,9 +324,47 @@ INNER JOIN eleccionpartido elep ON cv.id_eleccion_partido = elep.id_eleccion_par
 INNER JOIN partido par ON elep.id_partido = par.id_partido
 group by p.nombre, par.nombre)x
 group by x.pais
-order by "DIFERENCIA PORCENTUAL%";
+order by "DIFERENCIA PORCENTUAL%"
+FETCH NEXT 1 ROWS ONLY
+;
 /****************************************************************************************************************************************************************/
-/************************************************************** Consulta 10 *************************************************************************************/
-
-
-
+/************************************************************** Consulta 11 *************************************************************************************/
+SELECT x.total as total_votos, ROUND(h.total/x.total*100,2) as "PORCENTAJE MUJERES ALFABETAS%" FROM 
+(select sum(cv.alfabetos+cv.analfabetos) as total from conteovotos cv) x, 
+(select sum(cv.analfabetos+cv.alfabetos) as total from conteovotos cv 
+INNER JOIN raza raz ON cv.id_raza = raz.id_raza
+INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
+where UPPER(raz.nombre) = 'INDIGENAS'
+and UPPER(sex.nombre) = 'MUJERES') h;
+/***************************************************************************************************************************************************************/
+/************************************************************** Consulta 12 ************************************************************************************/
+SELECT x.pais, ROUND((x.analfabetas/x.total)*100,2) as porcentaje from (
+select p.nombre as pais, sum(cv.analfabetos) as analfabetas, sum(cv.analfabetos+cv.alfabetos) as total 
+from conteovotos cv 
+INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+INNER JOIN region r ON d.id_region = r.id_region
+INNER JOIN pais p ON r.id_pais = p.id_pais
+group by p.nombre
+)x
+order by porcentaje desc
+FETCH NEXT 1 ROWS ONLY;
+/****************************************************************************************************************************************************************/
+/************************************************************** Consulta 13 ************************************************************************************/
+SELECT result.dep, result.votos AS "CANTIDAD VOTOS" FROM (SELECT d.id_departamento, d.nombre AS DEP, SUM(cv.alfabetos + cv.analfabetos) AS VOTOS FROM conteovotos cv
+INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+INNER JOIN region r ON d.id_region = r.id_region
+INNER JOIN pais p ON r.id_pais = p.id_pais
+AND UPPER(p.nombre) = 'GUATEMALA'
+group by d.id_departamento, d.nombre) result, (SELECT d.id_departamento, d.nombre AS DEP, SUM(cv.alfabetos + cv.analfabetos) AS VOTOS FROM conteovotos cv
+INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+INNER JOIN region r ON d.id_region = r.id_region
+INNER JOIN pais p ON r.id_pais = p.id_pais
+AND UPPER(p.nombre) = 'GUATEMALA'
+AND UPPER(d.nombre) = 'GUATEMALA'
+group by d.id_departamento, d.nombre) aux
+WHERE result.votos > aux.votos;
+/****************************************************************************************************************************************************************/
+/************************************************************** Consulta 14 ************************************************************************************/
