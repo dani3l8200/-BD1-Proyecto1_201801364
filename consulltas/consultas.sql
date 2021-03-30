@@ -162,15 +162,25 @@ SELECT TOTAL.PAIS, PART.PARTIDO, TOTAL.CANTIDAD FROM
         order by total.pais;
 /******************************************************************************************************************************************************/
 /******************************************************************Consulta 4 *************************************************************************/
-SELECT p.nombre as pais, r.nombre as region, raz.nombre, SUM(cv.alfabetos+cv.analfabetos) as total from conteovotos cv 
+SELECT  h.pais, h.region, h.total from (SELECT x.pais, x.region, max(x.total) as total from (SELECT p.nombre as pais, r.nombre as region, raz.nombre as raza, SUM(cv.alfabetos+cv.analfabetos) as total from conteovotos cv 
 INNER JOIN raza raz on cv.id_raza = raz.id_raza
 INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
 INNER JOIN departamento d ON m.id_departamento = d.id_departamento
 INNER JOIN region r ON d.id_region = r.id_region
 INNER JOIN pais p ON r.id_pais = p.id_pais
-where raz.nombre = 'INDIGENAS'
 group by p.nombre, r.nombre, raz.nombre
-order by pais;
+order by pais) x group by x.pais, x.region) v, (SELECT p.nombre as pais, r.nombre as region, raz.nombre as raza, SUM(cv.alfabetos+cv.analfabetos) as total from conteovotos cv 
+INNER JOIN raza raz on cv.id_raza = raz.id_raza
+INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+INNER JOIN region r ON d.id_region = r.id_region
+INNER JOIN pais p ON r.id_pais = p.id_pais
+group by p.nombre, r.nombre, raz.nombre
+order by pais) h
+where v.pais = h.pais
+and v.region = h.region
+and v.total = h.total
+and h.raza = 'INDIGENAS';
 /*******************************************************************************************************************************************************/
 /****************************************************************Consulta 5 *****************************************************************************/
 SELECT x.pais, x.departamento, 
@@ -217,7 +227,7 @@ group by x.pais, x.region
 order by x.pais,x.region asc;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 7 **************************************************************************************/
-SELECT DISTINCT x.pais, x.muni, (select h.partido from (SELECT p.nombre as pais, d.nombre as departamento, 
+/*SELECT DISTINCT x.pais, x.muni, (select h.partido from (SELECT p.nombre as pais, d.nombre as departamento, 
 m.nombre  muni, par.nombre as partido, sum(cv.alfabetos+cv.analfabetos) as total 
 from conteovotos cv
 INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
@@ -253,11 +263,12 @@ INNER JOIN pais p ON r.id_pais = p.id_pais
 INNER JOIN eleccionpartido elep ON cv.id_eleccion_partido= elep.id_eleccion_partido
 INNER JOIN partido par ON elep.id_partido = par.id_partido
 group by p.nombre, d.nombre, m.nombre, par.nombre) x
-order by pais;
+group by x.pais, x.muni
+order by pais ;*/
 
-
-SELECT DOS.PAIS, DOS.MUNICIPIO, DOS.PARTIDO, TRES.PARTIDO FROM(
-SELECT UNO.PAIS AS PAIS, UNO.MUNICIPIO AS MUNICIPIO, UNO.PARTIDO AS PARTIDO, ROW_NUMBER() OVER (PARTITION BY UNO.PAIS,UNO.MUNICIPIO ORDER BY UNO.VOTOS desc) AS VOTOS_RANK, UNO.VOTOS
+SELECT segundo_partido.PAIS, segundo_partido.MUNICIPIO, segundo_partido.PARTIDO FROM(
+SELECT primer_partido.PAIS AS PAIS, primer_partido.MUNICIPIO AS MUNICIPIO, primer_partido.PARTIDO AS PARTIDO, ROW_NUMBER() OVER 
+(PARTITION BY primer_partido.PAIS,primer_partido.MUNICIPIO ORDER BY primer_partido.VOTOS desc) AS VOTOS_TOP, primer_partido.VOTOS
 FROM (
 SELECT p.nombre AS PAIS, m.nombre AS MUNICIPIO, par.nombre AS PARTIDO, SUM(cv.analfabetos + cv.alfabetos) AS VOTOS 
 FROM conteovotos cv
@@ -268,26 +279,11 @@ INNER JOIN pais p ON r.id_pais = p.id_pais
 INNER JOIN eleccionpartido elep ON cv.id_eleccion_partido= elep.id_eleccion_partido
 INNER JOIN partido par ON elep.id_partido = par.id_partido
 group by p.nombre, m.nombre, par.nombre
-) UNO
-ORDER BY UNO.PAIS, UNO.MUNICIPIO, VOTOS_RANK
-) DOS, (
-SELECT UNO.PAIS AS PAIS, UNO.MUNICIPIO AS MUNICIPIO, UNO.PARTIDO AS PARTIDO, ROW_NUMBER() OVER (PARTITION BY UNO.PAIS,UNO.MUNICIPIO ORDER BY UNO.VOTOS desc) AS VOTOS_RANK, UNO.VOTOS
-FROM (
-SELECT p.nombre AS PAIS, m.nombre AS MUNICIPIO, par.nombre AS PARTIDO, SUM(cv.analfabetos + cv.alfabetos) AS VOTOS 
-FROM conteovotos cv
-INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
-INNER JOIN departamento d ON m.id_departamento = d.id_departamento
-INNER JOIN region r ON d.id_region = r.id_xSregion
-INNER JOIN pais p ON r.id_pais = p.id_pais
-INNER JOIN eleccionpartido elep ON cv.id_eleccion_partido= elep.id_eleccion_partido
-INNER JOIN partido par ON elep.id_partido = par.id_partido
-group by p.nombre, m.nombre, par.nombre
-) UNO
-ORDER BY UNO.PAIS, UNO.MUNICIPIO, VOTOS_RANK
-OFFSET 1 ROWS FETCH NEXT 1 ROWS ONLY
-) TRES
-WHERE DOS.VOTOS_RANK <= 1
-ORDER BY DOS.PAIS, DOS.MUNICIPIO, DOS.VOTOS_RANK;
+) primer_partido
+ORDER BY primer_partido.PAIS, primer_partido.MUNICIPIO, VOTOS_TOP
+) segundo_partido
+WHERE segundo_partido.VOTOS_TOP <= 2
+ORDER BY segundo_partido.PAIS, segundo_partido.MUNICIPIO, segundo_partido.VOTOS_TOP;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 8 **************************************************************************************/
 SELECT p.nombre as pais, sum(cv.primaria) as primaria, sum(cv.nivel_medio) as 
