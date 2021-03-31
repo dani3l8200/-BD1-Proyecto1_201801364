@@ -1,1 +1,1 @@
-sqlldr userid=hr@xepdb1 control='C:\BD1\proyecto1\load_data\carga.ctl'
+sqlldr userid=hr/hr@xepdb1 control='C:\BD1\proyecto1\load_data\carga.ctl'

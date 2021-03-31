@@ -1,5 +1,17 @@
 /************************************************CONSULTA 1 **********************************************************************************/
-SELECT result1.nombre_eleccion as eleccion, result1.anio as "a�o eleccion",result1.pais as pais,result3.partido, ROUND(result1.mayor/result2.votos*100,2) as porcentaje
+set trimout on
+set tab off
+set wrap on;
+set pagesize 50000;
+set linesize 120;
+SET ECHO ON
+COLUMN eleccion HEADING "ELECCION" FORMAT a25 JUSTIFY CENTER
+COLUMN year_eleccion HEADING "YEAR" FORMAT 9999 JUSTIFY CENTER
+COLUMN pais HEADING "PAIS" FORMAT a15 JUSTIFY CENTER
+COLUMN partido HEADING "PARTIDO" FORMAT a27 JUSTIFY CENTER
+COLUMN porcentaje HEADING "PORCENT%" FORMAT 99.99 JUSTIFY CENTER
+prompt --                                         CONSULTA 1
+SELECT result1.nombre_eleccion as eleccion, result1.anio as year_eleccion,result1.pais as pais,result3.partido as partido, ROUND(result1.mayor/result2.votos*100,2) as porcentaje
 from (select sub1.nombre as nombre_eleccion, sub1.anio, sub1.pais, MAX(sub1.votos) as mayor from 
         (SELECT ele.nombre as nombre, ele.anio, p.nombre as pais, par.nombre as partido, SUM(cv.alfabetos+cv.analfabetos) as votos
         FROM conteovotos cv 
@@ -45,36 +57,38 @@ from (select sub1.nombre as nombre_eleccion, sub1.anio, sub1.pais, MAX(sub1.voto
 
 /******************************************************************************************************************************************************/
 /****************************************************** CONSULTA 2 ***********************************************************************************/
-SELECT p.nombre as pais, d.nombre as departamento, SUM(cv.analfabetos+cv.alfabetos) as TotalDepartamento,
 
-(SELECT sum(cv.alfabetos+cv.analfabetos) from conteovotos cv 
-INNER JOIN municipio mm ON cv.id_municipio = mm.id_municipio
-INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
-INNER JOIN departamento dd ON mm.id_departamento = dd.id_departamento
-INNER JOIN region rr ON dd.id_region = rr.id_region
-INNER JOIN pais pp ON rr.id_pais = pp.id_pais
-where pp.nombre = p.nombre and 
-sex.nombre = 'mujeres'
-group by pp.nombre
-) as TotalPais,
-
-ROUND(((SUM(cv.analfabetos+cv.alfabetos))
-/(SELECT sum(sum(cv.alfabetos+cv.analfabetos)) from conteovotos cv 
-INNER JOIN municipio mm ON cv.id_municipio = mm.id_municipio
-INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
-INNER JOIN departamento dd ON mm.id_departamento = dd.id_departamento
-INNER JOIN region rr ON dd.id_region = rr.id_region
-INNER JOIN pais pp ON rr.id_pais = pp.id_pais
-where sex.nombre = 'mujeres'
-and pp.nombre = p.nombre
-group by pp.nombre))*100,2) as "Porcentaje Departamentos",
-
-ROUND(((SELECT sum(sum(cv.alfabetos+cv.analfabetos)) from conteovotos cv 
-INNER JOIN municipio mm ON cv.id_municipio = mm.id_municipio
-INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
-INNER JOIN departamento dd ON mm.id_departamento = dd.id_departamento
-INNER JOIN region rr ON dd.id_region = rr.id_region
-INNER JOIN pais pp ON rr.id_pais = pp.id_pais
+COLUMN pais HEADING "PAIS" FORMAT a12 JUSTIFY CENTER
+COLUMN departamento HEADING "DEPTO" FORMAT a20
+COLUMN TotalDepartamento HEADING "TOT_DEPTO" FORMAT 9999999 JUSTIFY CENTER
+COLUMN partido HEADING "TOT_PAIS" FORMAT 99999999 JUSTIFY CENTER
+COLUMN PorcentajeDepartamentos HEADING "POR_DEPTO%" FORMAT 99.99 JUSTIFY CENTER
+COLUMN PorcentajePais HEADING "POR_PAIS%" FORMAT 99.99 JUSTIFY CENTER
+prompt --                                      CONSULTA 2
+SELECT p.nombre as pais, d.nombre as departamento, SUM(cv.analfabetos+cv.alfabetos) as TotalDepartamento, (SELECT sum(cv.alfabetos+cv.analfabetos) from conteovotos cv 
+    INNER JOIN municipio mm ON cv.id_municipio = mm.id_municipio
+    INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
+    INNER JOIN departamento dd ON mm.id_departamento = dd.id_departamento
+    INNER JOIN region rr ON dd.id_region = rr.id_region
+    INNER JOIN pais pp ON rr.id_pais = pp.id_pais
+    where pp.nombre = p.nombre and 
+    sex.nombre = 'mujeres'
+    group by pp.nombre
+)  TotalPais, ROUND(((SUM(cv.analfabetos+cv.alfabetos))
+/(  SELECT sum(sum(cv.alfabetos+cv.analfabetos)) from conteovotos cv 
+    INNER JOIN municipio mm ON cv.id_municipio = mm.id_municipio
+    INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
+    INNER JOIN departamento dd ON mm.id_departamento = dd.id_departamento
+    INNER JOIN region rr ON dd.id_region = rr.id_region
+    INNER JOIN pais pp ON rr.id_pais = pp.id_pais
+    where sex.nombre = 'mujeres'
+    and pp.nombre = p.nombre
+    group by pp.nombre))*100,2)  PorcentajeDepartamentos, ROUND(((SELECT sum(sum(cv.alfabetos+cv.analfabetos)) from conteovotos cv 
+    INNER JOIN municipio mm ON cv.id_municipio = mm.id_municipio
+    INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
+    INNER JOIN departamento dd ON mm.id_departamento = dd.id_departamento
+    INNER JOIN region rr ON dd.id_region = rr.id_region
+    INNER JOIN pais pp ON rr.id_pais = pp.id_pais
 where sex.nombre = 'mujeres'
 and pp.nombre = p.nombre
 group by pp.nombre)
@@ -85,8 +99,7 @@ INNER JOIN departamento dd ON mm.id_departamento = dd.id_departamento
 INNER JOIN region rr ON dd.id_region = rr.id_region
 INNER JOIN pais pp ON rr.id_pais = pp.id_pais
 where sex.nombre = 'mujeres'
-group by pp.nombre))*100,2) as "Porcentaje Pais"
-
+group by pp.nombre))*100,2)  PorcentajePais
 FROM conteovotos cv
 INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
 INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
@@ -96,10 +109,13 @@ INNER JOIN pais p ON r.id_pais = p.id_pais
 where UPPER(sex.nombre) = 'MUJERES'
 group by  p.nombre, d.nombre
 order by p.nombre asc;
-
 /******************************************************************************************************************************************************/
 /******************************************************************Consulta 3 *************************************************************************/
-SELECT ganador.pais, aux.partido, ganador.cantidad FROM 
+COLUMN pais HEADING "PAIS" FORMAT a12 JUSTIFY CENTER
+COLUMN partido HEADING "PARTIDO" FORMAT a28
+COLUMN cantidad HEADING "CANTIDAD_PARTIDO" FORMAT 999 JUSTIFY CENTER
+prompt --                 CONSULTA 3
+SELECT ganador.pais as pais, aux.partido as partido, ganador.cantidad as cantidad FROM 
 (SELECT resultquery.pais as pais, MAX(cantidad) as cantidad FROM 
     (SELECT resultquery.pais, resultquery.partido, COUNT(resultquery.muna) AS cantidad FROM
         (SELECT subquery1.pais as pais, subquery1.partido as partido, subquery1.idmun as muna, subquery2.votos FROM 
@@ -166,7 +182,11 @@ and ganador.cantidad = aux.cantidad
 order by ganador.pais;
 /******************************************************************************************************************************************************/
 /******************************************************************Consulta 4 *************************************************************************/
-SELECT  h.pais, h.region, h.total from (SELECT x.pais, x.region, max(x.total) as total from (SELECT p.nombre as pais, r.nombre as region, raz.nombre as raza, SUM(cv.alfabetos+cv.analfabetos) as total from conteovotos cv 
+COLUMN pais HEADING "PAIS" FORMAT a12 JUSTIFY CENTER
+COLUMN region HEADING "REGION" FORMAT a10
+COLUMN total HEADING "TOTAL_REGION" FORMAT 9999999 JUSTIFY CENTER
+prompt --            CONSULTA 4 
+SELECT  h.pais as pais, h.region as region, h.total as total from (SELECT x.pais, x.region, max(x.total) as total from (SELECT p.nombre as pais, r.nombre as region, raz.nombre as raza, SUM(cv.alfabetos+cv.analfabetos) as total from conteovotos cv 
 INNER JOIN raza raz on cv.id_raza = raz.id_raza
 INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
 INNER JOIN departamento d ON m.id_departamento = d.id_departamento
@@ -184,10 +204,16 @@ order by pais) h
 where v.pais = h.pais
 and v.region = h.region
 and v.total = h.total
-and h.raza = 'INDIGENAS';
+and h.raza = 'INDIGENAS'
+order by h.pais;
 /*******************************************************************************************************************************************************/
 /****************************************************************Consulta 5 *****************************************************************************/
-SELECT x.pais, x.departamento, 
+COLUMN pais HEADING "PAIS" FORMAT a12 JUSTIFY CENTER
+COLUMN departamento HEADING "DEPTO" FORMAT a20
+COLUMN mujeres HEADING "UNI_MUJERES" FORMAT 99.99 JUSTIFY CENTER
+COLUMN hombres HEADING "UNI_HOMBRES" FORMAT 99.99 JUSTIFY CENTER
+prompt --                       CONSULTA 5
+SELECT x.pais as pais, x.departamento as departamento, 
 ROUND((x.universitarios/(h.universitarios+x.universitarios))*100,2) as mujeres,
 ROUND((h.universitarios/(h.universitarios+x.universitarios))*100,2) as hombres
 from (  SELECT p.nombre as pais, d.nombre as departamento,
@@ -214,6 +240,10 @@ where x.universitarios > h.universitarios
 order by x.departamento;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 6 **************************************************************************************/
+COLUMN pais HEADING "PAIS" FORMAT a12 JUSTIFY CENTER
+COLUMN region HEADING "region" FORMAT a10
+COLUMN promedio HEADING "PROMEDIO" FORMAT 9999999.99 JUSTIFY CENTER
+prompt --          CONSULTA 6
 SELECT x.pais, x.region, ROUND(sum(x.total)/(SELECT count(*) 
 from (SELECT p.nombre as pais, d.nombre as departamento, r.nombre as region, sum(cv.analfabetos+cv.alfabetos) as total
                 from conteovotos  cv
@@ -234,7 +264,12 @@ group by x.pais, x.region
 order by x.pais,x.region asc;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 7 **************************************************************************************/
-/*SELECT DISTINCT x.pais, x.muni, (select h.partido from (SELECT p.nombre as pais, d.nombre as departamento, 
+COLUMN pais HEADING "PAIS" FORMAT a10 JUSTIFY CENTER
+COLUMN muni HEADING "MUNICIPIO" FORMAT a18
+COLUMN Partido1 HEADING "PARTIDO1" FORMAT a15 JUSTIFY CENTER
+COLUMN Partido2 HEADING "PARTIDO2" FORMAT a15 JUSTIFY CENTER
+prompt --                CONSULTA 7 VERSION 1
+SELECT DISTINCT x.pais, x.muni, (select h.partido from (SELECT p.nombre as pais, d.nombre as departamento, 
 m.nombre  muni, par.nombre as partido, sum(cv.alfabetos+cv.analfabetos) as total 
 from conteovotos cv
 INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
@@ -271,8 +306,12 @@ INNER JOIN eleccionpartido elep ON cv.id_eleccion_partido= elep.id_eleccion_part
 INNER JOIN partido par ON elep.id_partido = par.id_partido
 group by p.nombre, d.nombre, m.nombre, par.nombre) x
 group by x.pais, x.muni
-order by pais ;*/
+order by pais ;
 
+COLUMN pais HEADING "PAIS" FORMAT a12 JUSTIFY CENTER
+COLUMN municipio HEADING "MUNICIPIO" FORMAT a20
+COLUMN partido HEADING "PARTIDO" FORMAT a28 JUSTIFY CENTER
+prompt --                CONSULTA 7 VERSION 2
 SELECT segundo_partido.PAIS, segundo_partido.MUNICIPIO, segundo_partido.PARTIDO FROM(
 SELECT primer_partido.PAIS AS PAIS, primer_partido.MUNICIPIO AS MUNICIPIO, primer_partido.PARTIDO AS PARTIDO, ROW_NUMBER() OVER 
 (PARTITION BY primer_partido.PAIS,primer_partido.MUNICIPIO ORDER BY primer_partido.VOTOS desc) AS VOTOS_TOP, primer_partido.VOTOS
@@ -293,6 +332,11 @@ WHERE segundo_partido.VOTOS_TOP <= 2
 ORDER BY segundo_partido.PAIS, segundo_partido.MUNICIPIO, segundo_partido.VOTOS_TOP;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 8 **************************************************************************************/
+COLUMN pais HEADING "PAIS" FORMAT a12 JUSTIFY CENTER
+COLUMN primaria HEADING "PRIMARIA" FORMAT 9999999 JUSTIFY CENTER
+COLUMN "NIVEL MEDIO" HEADING "NIVEL_MEDIO" FORMAT 9999999 JUSTIFY CENTER
+COLUMN universitarios HEADING "UNIVERSI" FORMAT 9999999 JUSTIFY CENTER
+prompt --                CONSULTA 8
 SELECT p.nombre as pais, sum(cv.primaria) as primaria, sum(cv.nivel_medio) as 
 "NIVEL MEDIO", sum(cv.universitarios) as universitarios from conteovotos cv
 INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
@@ -303,6 +347,10 @@ group by p.nombre
 order by pais asc;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 9 **************************************************************************************/
+COLUMN pais HEADING "PAIS" FORMAT a12 JUSTIFY CENTER
+COLUMN raza HEADING "RAZA" FORMAT a15 JUSTIFY CENTER
+COLUMN "TOTAL PORCENTUAL%" HEADING "TOTAL_PORCENTUAL%" FORMAT 99.99 JUSTIFY CENTER
+prompt --                CONSULTA 9
 SELECT x.pais, x.raza, ROUND((x.total/(SELECT sum(h.total) from (SELECT p.nombre as pais, raz.nombre as raza, sum(cv.alfabetos+cv.analfabetos) as total
 FROM conteovotos cv
 INNER JOIN raza raz ON cv.id_raza = raz.id_raza
@@ -323,6 +371,9 @@ group by p.nombre, raz.nombre) x
 order by x.pais;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 10 *************************************************************************************/
+COLUMN pais HEADING "PAIS" FORMAT a12 JUSTIFY CENTER
+COLUMN "DIFERENCIA PORCENTUAL%" HEADING "DIFERENCIA_PORCENTUAL%" FORMAT 99.99 JUSTIFY CENTER
+prompt --                CONSULTA 10
 select x.pais,ROUND((max(x.total)-min(x.total))/(select sum(h.total) from (
 select p.nombre as pais, par.nombre as partido, sum(cv.alfabetos+cv.analfabetos) as total 
 from conteovotos cv 
@@ -344,10 +395,12 @@ INNER JOIN partido par ON elep.id_partido = par.id_partido
 group by p.nombre, par.nombre)x
 group by x.pais
 order by "DIFERENCIA PORCENTUAL%"
-FETCH NEXT 1 ROWS ONLY
-;
+FETCH NEXT 1 ROWS ONLY;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 11 *************************************************************************************/
+prompt --                CONSULTA 11
+COLUMN total_votos HEADING "TOT_VOTOS" FORMAT 999999999 JUSTIFY CENTER
+COLUMN "PORCENTAJE MUJERES ALFABETAS%" HEADING "PORC_MUJER_ALFABETAS%" FORMAT 99.99 JUSTIFY CENTER
 SELECT x.total as total_votos, ROUND(h.total/x.total*100,2) as "PORCENTAJE MUJERES ALFABETAS%" FROM 
 (select sum(cv.alfabetos+cv.analfabetos) as total from conteovotos cv) x, 
 (select sum(cv.alfabetos) as total from conteovotos cv 
@@ -357,6 +410,9 @@ where UPPER(raz.nombre) = 'INDIGENAS'
 and UPPER(sex.nombre) = 'MUJERES') h;
 /***************************************************************************************************************************************************************/
 /************************************************************** Consulta 12 ************************************************************************************/
+COLUMN pais HEADING "PAIS" FORMAT a12 JUSTIFY CENTER
+COLUMN porcentaje HEADING "PORCENTAJE%" FORMAT 99.99 JUSTIFY CENTER
+prompt --                CONSULTA 12 VERSION 1
 SELECT x.pais, ROUND((x.analfabetas/x.total)*100,2) as porcentaje from (
 select p.nombre as pais, sum(cv.analfabetos) as analfabetas, sum(cv.analfabetos+cv.alfabetos) as total 
 from conteovotos cv 
@@ -369,6 +425,9 @@ group by p.nombre
 order by porcentaje desc
 FETCH NEXT 1 ROWS ONLY;
 /************************************************************** VERSION 2 ************************************************************************************/
+COLUMN pais HEADING "PAIS" FORMAT a12 JUSTIFY CENTER
+COLUMN porcentaje HEADING "PORCENTAJE%" FORMAT 99.99 JUSTIFY CENTER
+prompt --                CONSULTA 12 VERSION 2
 SELECT x.pais, ROUND((x.analfabetas/h.total)*100,2) as porcentaje from (
 select p.nombre as pais, sum(cv.analfabetos) as analfabetas, sum(cv.analfabetos+cv.alfabetos) as total 
 from conteovotos cv 
@@ -390,6 +449,9 @@ order by porcentaje desc
 FETCH NEXT 1 ROWS ONLY;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 13 ************************************************************************************/
+COLUMN dep HEADING "DEPTO" FORMAT a20 JUSTIFY CENTER
+COLUMN "CANTIDAD VOTOS" HEADING "CANTIDAD_VOTOS" FORMAT 9999999 JUSTIFY CENTER
+prompt --                CONSULTA 13
 SELECT result.dep, result.votos AS "CANTIDAD VOTOS" FROM (SELECT d.id_departamento, d.nombre AS DEP, SUM(cv.alfabetos + cv.analfabetos) AS VOTOS FROM conteovotos cv
 INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
 INNER JOIN departamento d ON m.id_departamento = d.id_departamento
@@ -407,6 +469,9 @@ group by d.id_departamento, d.nombre) aux
 WHERE result.votos > aux.votos;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 14 ************************************************************************************/
+COLUMN INICIAL HEADING "INICIAL" FORMAT a5 JUSTIFY CENTER
+COLUMN "total" HEADING "CANTIDAD_VOTOS" FORMAT 99999999 JUSTIFY CENTER
+prompt --                CONSULTA 14
 SELECT UPPER(SUBSTR(REPLACE(m.nombre,' ',''),1,1)) as INICIAL, SUM(cv.alfabetos+cv.analfabetos) as total FROM conteovotos cv
 INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
 INNER JOIN departamento d ON m.id_departamento = d.id_departamento
@@ -414,3 +479,4 @@ INNER JOIN region r ON d.id_region = r.id_region
 INNER JOIN pais p ON r.id_pais = p.id_pais
 group by SUBSTR(REPLACE(m.nombre,' ',''),1,1)
 order by UPPER(SUBSTR(REPLACE(m.nombre,' ',''),1,1));
+exit;

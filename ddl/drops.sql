@@ -1,0 +1,12 @@
+DROP TABLE Temporal;
+DROP TABLE Pais cascade constraints;
+DROP TABLE Region cascade constraints;
+DROP TABLE Departamento cascade constraints;
+DROP TABLE Municipio cascade constraints;
+DROP TABLE Eleccion cascade constraints;
+DROP TABLE Partido  cascade constraints;
+DROP TABLE EleccionPartido  cascade constraints;
+DROP TABLE Sexo cascade constraints;
+DROP TABLE Raza  cascade constraints;
+DROP TABLE ConteoVotos cascade constraints;
+exit;

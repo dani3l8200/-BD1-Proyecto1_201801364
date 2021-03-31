@@ -1,5 +1,5 @@
 
-SQL*Loader: Release 18.0.0.0.0 - Production on Tue Mar 30 07:30:41 2021
+SQL*Loader: Release 18.0.0.0.0 - Production on Wed Mar 31 22:52:17 2021
 Version 18.4.0.0.0
 
 Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
@@ -7,8 +7,8 @@ Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
 Control File:   C:\BD1\proyecto1\load_data\carga.ctl
 Character Set UTF8 specified for all input.
 
-Data File:      ICE-Fuente.csv
-  Bad File:     C:\BD1\proyecto1\load_data\ICE-Fuente.bad
+Data File:      carga.csv
+  Bad File:     C:\BD1\proyecto1\load_data\carga.bad
   Discard File:  none specified
  
  (Allow all discards)
@@ -27,39 +27,22 @@ TRAILING NULLCOLS option in effect
    Column Name                  Position   Len  Term Encl Datatype
 ------------------------------ ---------- ----- ---- ---- ---------------------
 NOMBRE_ELECCION                     FIRST     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:NOMBRE_ELECCION)"
 YEAR_ELECCION                        NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:YEAR_ELECCION)"
 PAIS                                 NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:PAIS)"
 REGION                               NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:REGION)"
 DEPTO                                NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:DEPTO)"
 MUNICIPIO                            NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:MUNICIPIO)"
 PARTIDO                              NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:PARTIDO)"
 NOMBRE_PARTIDO                       NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:NOMBRE_PARTIDO)"
 SEXO                                 NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:SEXO)"
 RAZA                                 NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:RAZA)"
 ANALFABETOS                          NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:ANALFABETOS)"
 ALFABETOS                            NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:ALFABETOS)"
 SEXO2                                NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:SEXO2)"
 RAZA2                                NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:RAZA2)"
 PRIMARIA                             NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:PRIMARIA)"
 NIVEL_MEDIO                          NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:NIVEL_MEDIO)"
 UNIVERSITARIOS                       NEXT     *   ,       CHARACTER            
-    SQL string for column : "TRIM(:UNIVERSITARIOS)"
 
 value used for ROWS parameter changed from 250 to 239
 
@@ -78,8 +61,8 @@ Total logical records read:         20970
 Total logical records rejected:         0
 Total logical records discarded:        0
 
-Run began on Tue Mar 30 07:30:41 2021
-Run ended on Tue Mar 30 07:30:44 2021
+Run began on Wed Mar 31 22:52:17 2021
+Run ended on Wed Mar 31 22:52:18 2021
 
-Elapsed time was:     00:00:02.98
-CPU time was:         00:00:00.30
+Elapsed time was:     00:00:00.94
+CPU time was:         00:00:00.24

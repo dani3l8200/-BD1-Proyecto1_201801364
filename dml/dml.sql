@@ -1,3 +1,9 @@
+COLUMN table_name HEADING "Table Name" FORMAT a15 JUSTIFY CENTER
+COLUMN count HEADING "CONTEO TABLAS" FORMAT 99999 JUSTIFY CENTER
+set trimout on
+set tab off
+set wrap off 
+SET ECHO ON
 /******************************************************************************************************/
 INSERT INTO pais(nombre)
 SELECT DISTINCT(pais) FROM temporal;
@@ -64,6 +70,7 @@ AND t.year_eleccion = ele.anio
 AND t.partido = par.partido
 AND t.nombre_partido = par.nombre;
 /******************************************************************************************************/
+prompt -- conteo de datos
 select
    table_name,
    to_number(
@@ -76,3 +83,4 @@ from
 order by 
    table_name;
 /******************************************************************************************************/
+exit;
