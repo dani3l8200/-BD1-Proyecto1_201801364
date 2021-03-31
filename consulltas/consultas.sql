@@ -58,7 +58,7 @@ sex.nombre = 'mujeres'
 group by pp.nombre
 ) as TotalPais,
 
-ROUND((SUM(cv.analfabetos+cv.alfabetos))
+ROUND(((SUM(cv.analfabetos+cv.alfabetos))
 /(SELECT sum(sum(cv.alfabetos+cv.analfabetos)) from conteovotos cv 
 INNER JOIN municipio mm ON cv.id_municipio = mm.id_municipio
 INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
@@ -67,9 +67,9 @@ INNER JOIN region rr ON dd.id_region = rr.id_region
 INNER JOIN pais pp ON rr.id_pais = pp.id_pais
 where sex.nombre = 'mujeres'
 and pp.nombre = p.nombre
-group by pp.nombre),2) as PorcentajeDepartamentos,
+group by pp.nombre))*100,2) as "Porcentaje Departamentos",
 
-ROUND((SELECT sum(sum(cv.alfabetos+cv.analfabetos)) from conteovotos cv 
+ROUND(((SELECT sum(sum(cv.alfabetos+cv.analfabetos)) from conteovotos cv 
 INNER JOIN municipio mm ON cv.id_municipio = mm.id_municipio
 INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
 INNER JOIN departamento dd ON mm.id_departamento = dd.id_departamento
@@ -85,7 +85,7 @@ INNER JOIN departamento dd ON mm.id_departamento = dd.id_departamento
 INNER JOIN region rr ON dd.id_region = rr.id_region
 INNER JOIN pais pp ON rr.id_pais = pp.id_pais
 where sex.nombre = 'mujeres'
-group by pp.nombre),2) as PorcentajePais
+group by pp.nombre))*100,2) as "Porcentaje Pais"
 
 FROM conteovotos cv
 INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
@@ -95,7 +95,8 @@ INNER JOIN region r ON d.id_region = r.id_region
 INNER JOIN pais p ON r.id_pais = p.id_pais
 where UPPER(sex.nombre) = 'MUJERES'
 group by  p.nombre, d.nombre
-order by TotalPais desc;
+order by p.nombre asc;
+
 /******************************************************************************************************************************************************/
 /******************************************************************Consulta 3 *************************************************************************/
 SELECT ganador.pais, aux.partido, ganador.cantidad FROM 
@@ -196,6 +197,7 @@ from (  SELECT p.nombre as pais, d.nombre as departamento,
             INNER JOIN region r ON d.id_region = r.id_region
             INNER JOIN pais p ON r.id_pais = p.id_pais
             INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
+            where UPPER(sex.nombre) = 'MUJERES'
             group by p.nombre, d.nombre, sex.nombre
 ) x
 INNER JOIN (SELECT p.nombre as pais, d.nombre as departamento,
@@ -205,9 +207,11 @@ INNER JOIN (SELECT p.nombre as pais, d.nombre as departamento,
                 INNER JOIN region r ON d.id_region = r.id_region
                 INNER JOIN pais p ON r.id_pais = p.id_pais
                 INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
+                where UPPER(sex.nombre) = 'HOMBRES'
                 group by p.nombre, d.nombre, sex.nombre
 ) h on x.pais = h.pais and x.departamento = h.departamento
-where x.universitarios > h.universitarios;
+where x.universitarios > h.universitarios
+order by x.departamento;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 6 **************************************************************************************/
 SELECT x.pais, x.region, ROUND(sum(x.total)/(SELECT count(*) 
@@ -346,7 +350,7 @@ FETCH NEXT 1 ROWS ONLY
 /************************************************************** Consulta 11 *************************************************************************************/
 SELECT x.total as total_votos, ROUND(h.total/x.total*100,2) as "PORCENTAJE MUJERES ALFABETAS%" FROM 
 (select sum(cv.alfabetos+cv.analfabetos) as total from conteovotos cv) x, 
-(select sum(cv.analfabetos+cv.alfabetos) as total from conteovotos cv 
+(select sum(cv.alfabetos) as total from conteovotos cv 
 INNER JOIN raza raz ON cv.id_raza = raz.id_raza
 INNER JOIN sexo sex ON cv.id_sexo = sex.id_sexo
 where UPPER(raz.nombre) = 'INDIGENAS'
@@ -361,7 +365,27 @@ INNER JOIN departamento d ON m.id_departamento = d.id_departamento
 INNER JOIN region r ON d.id_region = r.id_region
 INNER JOIN pais p ON r.id_pais = p.id_pais
 group by p.nombre
-)x
+) x
+order by porcentaje desc
+FETCH NEXT 1 ROWS ONLY;
+/************************************************************** VERSION 2 ************************************************************************************/
+SELECT x.pais, ROUND((x.analfabetas/h.total)*100,2) as porcentaje from (
+select p.nombre as pais, sum(cv.analfabetos) as analfabetas, sum(cv.analfabetos+cv.alfabetos) as total 
+from conteovotos cv 
+INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+INNER JOIN region r ON d.id_region = r.id_region
+INNER JOIN pais p ON r.id_pais = p.id_pais
+group by p.nombre
+) x,
+(select sum(x.total) as total from 
+(select p.nombre as pais, sum(cv.analfabetos) as analfabetas, sum(cv.analfabetos+cv.alfabetos) as total 
+from conteovotos cv 
+INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
+INNER JOIN departamento d ON m.id_departamento = d.id_departamento
+INNER JOIN region r ON d.id_region = r.id_region
+INNER JOIN pais p ON r.id_pais = p.id_pais
+group by p.nombre)x) h
 order by porcentaje desc
 FETCH NEXT 1 ROWS ONLY;
 /****************************************************************************************************************************************************************/
@@ -383,10 +407,10 @@ group by d.id_departamento, d.nombre) aux
 WHERE result.votos > aux.votos;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 14 ************************************************************************************/
-SELECT UPPER(SUBSTR(m.nombre,1,1)) as INICIAL, SUM(cv.alfabetos+cv.analfabetos) as total FROM conteovotos cv
+SELECT UPPER(SUBSTR(REPLACE(m.nombre,' ',''),1,1)) as INICIAL, SUM(cv.alfabetos+cv.analfabetos) as total FROM conteovotos cv
 INNER JOIN municipio m ON cv.id_municipio = m.id_municipio
 INNER JOIN departamento d ON m.id_departamento = d.id_departamento
 INNER JOIN region r ON d.id_region = r.id_region
 INNER JOIN pais p ON r.id_pais = p.id_pais
-group by SUBSTR(m.nombre,1,1)
-order by UPPER(SUBSTR(m.nombre,1,1));
+group by SUBSTR(REPLACE(m.nombre,' ',''),1,1)
+order by UPPER(SUBSTR(REPLACE(m.nombre,' ',''),1,1));

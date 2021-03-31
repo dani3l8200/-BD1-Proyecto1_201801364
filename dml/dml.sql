@@ -64,3 +64,15 @@ AND t.year_eleccion = ele.anio
 AND t.partido = par.partido
 AND t.nombre_partido = par.nombre;
 /******************************************************************************************************/
+select
+   table_name,
+   to_number(
+   extractvalue(
+      xmltype(
+         dbms_xmlgen.getxml('select count(*) c from '||table_name))
+    ,'/ROWSET/ROW/C')) count
+from 
+   user_tables
+order by 
+   table_name;
+/******************************************************************************************************/

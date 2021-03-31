@@ -81,5 +81,4 @@ CREATE TABLE ConteoVotos(
     FOREIGN KEY(id_municipio) REFERENCES Municipio(id_municipio),
     FOREIGN KEY(id_eleccion_partido) REFERENCES EleccionPartido(id_eleccion_partido)
 );
-SELECT * FROM ConteoVOtos;
 /******************************************************************************************************/
