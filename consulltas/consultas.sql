@@ -469,7 +469,7 @@ group by d.id_departamento, d.nombre) aux
 WHERE result.votos > aux.votos;
 /****************************************************************************************************************************************************************/
 /************************************************************** Consulta 14 ************************************************************************************/
-COLUMN INICIAL HEADING "INICIAL" FORMAT a5 JUSTIFY CENTER
+COLUMN INICIAL HEADING "INICIAL" FORMAT a12 JUSTIFY CENTER
 COLUMN "total" HEADING "CANTIDAD_VOTOS" FORMAT 99999999 JUSTIFY CENTER
 prompt --                CONSULTA 14
 SELECT UPPER(SUBSTR(REPLACE(m.nombre,' ',''),1,1)) as INICIAL, SUM(cv.alfabetos+cv.analfabetos) as total FROM conteovotos cv
